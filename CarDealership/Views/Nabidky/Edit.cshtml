@@ -1,0 +1,151 @@
+﻿@model CarDealership.Models.Vehicle
+
+@{
+    ViewData["Title"] = "Upravit vozidlo";
+}
+
+<div class="container py-4">
+    <h2 class="mb-4">@ViewData["Title"]</h2>
+
+    <form asp-action="Edit" enctype="multipart/form-data">
+        <input type="hidden" asp-for="Id" />
+
+        <div class="row">
+            <div class="col-md-6">
+
+                <div class="mb-3">
+                    <label class="form-label">Značka</label>
+                    <input asp-for="Brand" class="form-control" required />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Model</label>
+                    <input asp-for="Model" class="form-control" required />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Rok výroby</label>
+                    <input asp-for="Year" type="number" class="form-control" required />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Kilometry</label>
+                    <input asp-for="Kilometers" type="number" class="form-control" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Palivo</label>
+                    <select asp-for="Fuel" class="form-select">
+                        <option>Benzín</option>
+                        <option>Nafta</option>
+                        <option>Plyn</option>
+                        <option>Elektro</option>
+                        <option>Hybrid</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Typ karoserie</label>
+                    <select asp-for="Body_type" class="form-select">
+                        <option>SUV</option>
+                        <option>Combi</option>
+                        <option>Sedan</option>
+                        <option>Hatchback</option>
+                        <option>Coupe</option>
+                        <option>Convertible</option>
+                        <option>Minivan</option>
+                        <option>Pickup</option>
+                        <option>Jiné</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label class="form-label">SPZ</label>
+                    <input asp-for="SPZ" class="form-control" id="spzInput" />
+                    <span id="spzError" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Status</label>
+                    <select asp-for="Status" class="form-select">
+                        <option>Nové</option>
+                        <option>Zachovalé</option>
+                        <option>Opotřebované</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Datum přidání</label>
+                    <input asp-for="From" type="date" class="form-control" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Poznámka</label>
+                    <textarea asp-for="Note" class="form-control" rows="3"></textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Aktuální fotka</label><br />
+                    @if (!string.IsNullOrEmpty(Model.Image))
+                    {
+                        <img src="@Model.Image" alt="Auto" width="250" class="rounded shadow-sm mb-2" />
+                    }
+                    else
+                    {
+                        <p class="text-muted">Žádná fotka není nahraná</p>
+                    }
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Změnit fotku</label>
+                    <input type="file" name="imageFile" class="form-control" accept="image/*" />
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" class="btn bg-sec button-sec">Uložit změny</button>
+        <a asp-action="Index" class="btn btn-dark ms-2">Zpět na seznam</a>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script> //SPZ validation
+        const spzInput = document.getElementById('spzInput');
+        const spzError = document.getElementById('spzError');
+        const form = document.querySelector('form');
+
+        let spzIsValid = true;
+
+        spzInput.addEventListener('input', async () => {
+            const spz = spzInput.value.trim();
+            if (!spz) { spzError.textContent = ""; spzIsValid = true; return;}
+
+            try {
+                const response = await fetch(`/Nabidky/CheckSPZ?spz=${encodeURIComponent(spz)}`);
+                const isAvailable = await response.json();
+
+                if (!isAvailable) {
+                    spzError.textContent = "Tato SPZ už v systému existuje.";
+                    spzIsValid = false;
+                } else {
+                    spzError.textContent = "";
+                    spzIsValid = true;
+                }
+            } catch (err) {
+                console.error("Chyba při ověřování SPZ:", err);
+            }
+        });
+
+        form.addEventListener('submit', e => {
+            if (!spzIsValid) {
+                e.preventDefault();
+                alert("Opravte SPZ ve formuláři.");
+            }
+        });
+
+    </script>
+}

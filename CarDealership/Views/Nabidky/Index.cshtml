@@ -1,0 +1,89 @@
+﻿@model IEnumerable<CarDealership.Models.Vehicle>
+
+@{
+    ViewData["Title"] = "Nabídka vozidel";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>@ViewData["Title"]</h2>
+        <a asp-action="Create" class="btn bg-sec button-sec">
+            <i class="fa fa-plus"></i> Přidat vozidlo
+        </a>
+    </div>
+
+    @if (Model == null || !Model.Any())
+    {
+        //empty list
+        <div class="alert alert-info">
+            Zatím zde nejsou žádné vozy. <a asp-action="Create">Přidejte první.</a>
+        </div>
+
+    }else
+    {
+        //list of vehicles
+        <div class="row g-4">
+            @foreach (var v in Model)
+
+            {
+                <div class="col-md-4 col-sm-6">
+                    <div class="card shadow-sm h-100">
+                        @if (!string.IsNullOrEmpty(v.Image))
+                        {
+                            <img src="@v.Image" class="card-img-top" alt="@v.Brand @v.Model" style="object-fit: cover; height: 200px;">
+                        }
+                        else
+                        {
+                            //default image
+                            <img src="/no-image.jpg" class="card-img-top" alt="Bez obrázku" style="object-fit: cover; height: 200px;">
+                        }
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title">@v.Brand @v.Model</h5>
+                            <p class="card-text text-muted">
+                                <small>@v.Year | @v.Kilometers km | @v.Fuel | @v.Body_type</small>
+                            </p>
+                            <p><b>Status:</b> @v.Status</p>
+
+                            <div class="mt-auto">
+                                <!-- buttons at the bottom of a vehicle's card' -->
+                                <a asp-action="Details" asp-route-id="@v.Id" class="btn btn-sm bg-sec me-1 button-sec">
+                                    <i class="fa fa-info-circle"></i> Detail
+                                </a>
+                                <a asp-action="Edit" asp-route-id="@v.Id" class="btn btn-sm btn-outline-dark me-1 ">
+                                    <i class="fa fa-pen"></i> Upravit
+                                </a>
+                                <form asp-action="Delete" asp-route-id="@v.Id" method="post" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-sm btn-outline-dark" onclick="return confirm('Opravdu smazat toto vozidlo?');">
+                                        <i class="fa fa-trash"></i> Smazat
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+    <div class="py-4 stats shadow">
+
+        <h4>Statistiky</h4>
+
+        <div class="">
+            Počet vozů: @Model.Count()
+        </div>
+        <div class="">
+            Vozidla do 100 000km: @Model.Count(v => v.Kilometers <= 100000)
+        </div>
+        <div>
+            Benzínová vozidla: @Model.Count(v => v.Fuel != null && v.Fuel.ToLower().Contains("benzín")) |
+            Naftová vozidla: @Model.Count(v => v.Fuel != null && v.Fuel.ToLower().Contains("nafta")) |
+            Alternativní pohon: @Model.Count(v => v.Fuel != null && (v.Fuel.ToLower().Contains("elektro") || v.Fuel.ToLower().Contains("hybrid") || v.Fuel.ToLower().Contains("plyn")))
+        </div>
+        <div>
+            Nová vozidla: @Model.Count(v => v.Status != null && v.Status.ToLower() == "nové")
+        </div>
+    </div>
+
+</div>

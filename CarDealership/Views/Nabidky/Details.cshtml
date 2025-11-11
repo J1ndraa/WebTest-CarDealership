@@ -1,0 +1,72 @@
+﻿@model CarDealership.Models.Vehicle
+
+@{
+    ViewData["Title"] = "Detail vozidla";
+}
+
+<div class="container py-4">
+
+    <div class="card shadow-lg">
+        <div class="row g-0">
+            <div class="col-md-6">
+                @if (!string.IsNullOrEmpty(Model.Image))
+                {
+                    <img src="@Model.Image" class="img-fluid rounded-start w-100 car-img" alt="@Model.Brand @Model.Model">
+                }
+                else
+                {
+                    <img src="/no-image.jpg" class="img-fluid rounded-start w-100 car-img" alt="Bez obrázku">
+                }
+            </div>
+
+            <div class="col-md-6 d-flex flex-column justify-content-between">
+                <div class="card-body">
+                    <h2 class="card-title">@Model.Brand @Model.Model</h2>
+                    <p class="text-sec">@Model.Year | @Model.Body_type | @Model.Fuel</p>
+
+                    <table class="table table-borderless mt-3">
+                        <tr>
+                            <th scope="row" class="text-muted">Najeto:</th>
+                            <td>@Model.Kilometers km</td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="text-muted">SPZ:</th>
+                            <td>@Model.SPZ</td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="text-muted">Status:</th>
+                            <td>@Model.Status</td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="text-muted">Datum přidání:</th>
+                            <td>@(Model.From.HasValue ? Model.From.Value.ToShortDateString() : "-")</td>
+                        </tr>
+                    </table>
+
+                    @if (!string.IsNullOrEmpty(Model.Note))
+                    {
+                        <div class="mt-3">
+                            <h5>Poznámka</h5>
+                            <hr />
+                            <p>@Model.Note</p>
+                        </div>
+                    }
+                </div>
+
+                <div class="card-footer bg-light d-flex justify-content-between align-items-center">
+                    <div>
+                        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-dark me-2">
+                            <i class="fa fa-pen"></i> Upravit
+                        </a>
+                        <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-outline-dark">
+                            <i class="fa fa-trash"></i> Smazat
+                        </a>
+                    </div>
+                    <a asp-action="Index" class="btn bg-sec button-sec">
+                        <i class="fa fa-arrow-left"></i> Zpět
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
